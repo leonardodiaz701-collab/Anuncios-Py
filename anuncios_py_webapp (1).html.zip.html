@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Anuncios Py — Plataforma</title>
+  <meta name="description" content="Anuncios Py - Plataforma de tareas y anuncios" />
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--accent:#0ea5ff;--muted:#94a3b8;--glass:rgba(255,255,255,0.03)}
+    *{box-sizing:border-box;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial}
+    body{margin:0;background:linear-gradient(180deg,#071025 0%, #071329 60%);color:#e6eef8}
+    header{display:flex;align-items:center;gap:12px;padding:18px 16px;border-bottom:1px solid rgba(255,255,255,0.03)}
+    .logo{width:46px;height:46px;border-radius:10px;background:linear-gradient(135deg,#0ea5ff,#7c3aed);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,0.6)}
+    .logo svg{width:30px;height:30px}
+    h1{font-size:18px;margin:0}
+    main{padding:18px;max-width:980px;margin:18px auto}
+    .grid{display:grid;grid-template-columns:1fr 340px;gap:18px}
+    .card{background:var(--card);padding:14px;border-radius:12px;box-shadow:0 6px 24px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.02)}
+    .muted{color:var(--muted);font-size:13px}
+    button{background:var(--accent);color:#022b3a;border:0;padding:10px 12px;border-radius:10px;font-weight:700;cursor:pointer}
+    input,select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit}
+    .list{display:flex;flex-direction:column;gap:10px}
+    .task{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:10px;background:var(--glass)}
+    footer{padding:14px;text-align:center;color:var(--muted);font-size:13px}
+    .small{font-size:13px}
+    .admin-badge{background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:8px;font-weight:700;color:var(--accent)}
+    .pill{background:rgba(255,255,255,0.02);padding:6px 8px;border-radius:999px;font-weight:700}
+    .row{display:flex;gap:8px;align-items:center}
+    .center{display:flex;align-items:center;gap:8px}
+    .hidden{display:none}
+    nav{display:flex;gap:8px;flex-wrap:wrap}
+    .link{background:transparent;border:1px solid rgba(255,255,255,0.03);padding:8px 10px;border-radius:8px}
+    .success{color:#8ef5b1}
+    .danger{color:#ff9b9b}
+    .admin-panel{display:flex;flex-direction:column;gap:12px}
+    .kpi{display:flex;gap:8px;align-items:center}
+    @media(max-width:920px){.grid{grid-template-columns:1fr;padding:0}.card{padding:12px}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo" aria-hidden>
+    <!-- Simple stylized A logo (Arizona style) -->
+    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#0ea5ff"/><stop offset="1" stop-color="#7c3aed"/></linearGradient>
+      </defs>
+      <rect width="100" height="100" rx="18" fill="url(#g)"/>
+      <path d="M30 70 L50 20 L70 70 L60 70 L50 45 L40 70 Z" fill="#021024" />
+    </svg>
+  </div>
+  <div>
+    <h1>Anuncios Py</h1>
+    <div class="muted small">Plataforma de tareas y promociones - ₲ (guaraní)</div>
+  </div>
+  <div style="margin-left:auto" class="row">
+    <div id="userBadge" class="pill">Invitado</div>
+  </div>
+</header>
+<main>
+  <div class="grid">
+    <section class="card">
+      <h2>Inicio</h2>
+      <p class="muted">Bienvenido a <strong>Anuncios Py</strong>. Aquí podés registrarte, ver tareas y acumular saldo en ₲ guaraníes. Cada tarea completada suma <strong>₲250</strong>. Cada referido registrado válido suma <strong>₲500</strong> para quien lo refiera.</p>
+
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+        <button id="btnRegister">Registrarme</button>
+        <button id="btnTasks">Tareas disponibles</button>
+        <button id="btnPanel">Panel - Admin</button>
+        <button id="btnMy">Mi cuenta</button>
+      </div>
+
+      <hr style="margin:12px 0;border-color:rgba(255,255,255,0.03)" />
+
+      <div id="mainArea" class="list">
+        <div class="muted">Usuarios registrados: <span id="countUsers">0</span> / 100</div>
+        <div class="muted">Campañas activas: <span id="countCampaigns">0</span></div>
+        <div class="muted">Saldo total retenido para usuarios: <span id="poolBalance">₲0</span></div>
+      </div>
+    </section>
+
+    <aside class="card">
+      <div class="admin-panel">
+        <div class="kpi"><strong>Panel rápido</strong></div>
+        <div class="muted small">Acceso admin: clave por defecto <span class="pill">admin1234</span></div>
+        <hr />
+        <div>
+          <h4>Crear campaña (Anunciante)</h4>
+          <label>Nombre del comercio</label>
+          <input id="c_name" placeholder="Ej: Pizzería Juan"/>
+          <label>Descripción</label>
+          <input id="c_desc" placeholder="Descripción breve"/>
+          <label>Presupuesto total (₲)</label>
+          <input id="c_budget" type="number" placeholder="150000"/>
+          <label>Límite participantes</label>
+          <input id="c_limit" type="number" placeholder="100" value="100"/>
+          <div style="display:flex;gap:8px;margin-top:8px"><button id="btnCreateCamp">Crear campaña</button></div>
+        </div>
+
+        <hr />
+        <div>
+          <h4>Solicitudes de retiro</h4>
+          <div id="withdrawList" class="list muted small"></div>
+        </div>
+
+        <hr />
+        <div>
+          <h4>Administrar usuarios</h4>
+          <div id="usersList" style="max-height:220px;overflow:auto"></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Sections hidden -->
+  <section id="registerSection" class="card hidden">
+    <h3>Registro</h3>
+    <div class="muted">Máximo 100 usuarios. Para registrar necesitás un nombre de usuario y, opcionalmente, código de referido.</div>
+    <label>Usuario (alias Telegram o nombre)</label>
+    <input id="r_user" placeholder="@usuario o nombre" />
+    <label>Código referido (opcional)</label>
+    <input id="r_ref" placeholder="Código del referidor" />
+    <div style="display:flex;gap:8px;margin-top:8px"><button id="doRegister">Crear cuenta</button><button id="cancelReg">Cancelar</button></div>
+    <div id="regMsg" class="muted small"></div>
+  </section>
+
+  <section id="tasksSection" class="card hidden">
+    <h3>Tareas disponibles</h3>
+    <div id="tasksList" class="list"></div>
+    <div class="muted small">Cada tarea paga ₲250. Límite: 1 tarea por anunciante por usuario.</div>
+  </section>
+
+  <section id="myAccount" class="card hidden">
+    <h3>Mi cuenta</h3>
+    <div class="muted">Alias: <span id="meName">-</span></div>
+    <div class="muted">Saldo disponible: <strong id="meBalance">₲0</strong></div>
+    <div class="muted">Retiros realizados: <span id="meWiths">0</span></div>
+    <div style="margin-top:10px">
+      <button id="btnRequestWithdraw">Solicitar retiro</button>
+      <button id="btnReferalLink">Obtener mi enlace de referido</button>
+    </div>
+    <div id="myMsg" class="muted small" style="margin-top:8px"></div>
+  </section>
+
+</main>
+<footer>
+  Anuncios Py — Demo funcional. Para producción necesitás backend y pasarela de pagos. Diseño profesional por Leonardo Ruiz.
+</footer>
+
+<script>
+// --- Simple data layer usando localStorage
+const LS_KEY = 'anuncios_py_v1';
+const adminPass = 'admin1234';
+const CURRENCY = '₲';
+
+function load(){
+  const raw = localStorage.getItem(LS_KEY);
+  if(raw) return JSON.parse(raw);
+  const base = {users:[], campaigns:[], withdrawals:[], settings:{firstWithdrawMin:100000, firstWithdrawRefs:20, taskValue:250, referValue:500, userLimit:100}};
+  localStorage.setItem(LS_KEY, JSON.stringify(base));
+  return base;
+}
+function save(state){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
+let state = load();
+
+// --- UI helpers
+const $ = id=>document.getElementById(id);
+function fmt(v){ return CURRENCY + Number(v).toLocaleString('es-PY'); }
+
+function refreshKPI(){
+  $('countUsers').innerText = state.users.length;
+  $('countCampaigns').innerText = state.campaigns.filter(c=>c.active).length;
+  const pool = state.campaigns.reduce((s,c)=> s + (c.active? c.poolRemaining:0),0);
+  $('poolBalance').innerText = fmt(pool);
+}
+
+function show(section){['registerSection','tasksSection','myAccount'].forEach(s=>$(s).classList.add('hidden')); if(section) $(section).classList.remove('hidden');}
+
+// --- Registration
+$('btnRegister').onclick = ()=>{ show('registerSection'); }
+$('cancelReg').onclick = ()=>{ show(); }
+$('doRegister').onclick = ()=>{
+  const name = $('r_user').value.trim();
+  const ref = $('r_ref').value.trim();
+  const max = state.settings.userLimit;
+  if(!name){ $('regMsg').innerText = 'Escribí un alias válido.'; return; }
+  if(state.users.length >= max){ $('regMsg').innerText = 'Límite de usuarios alcanzado.'; return; }
+  if(state.users.find(u=>u.alias === name)){ $('regMsg').innerText = 'Alias ya registrado.'; return; }
+  const user = {id:Date.now(), alias:name, balance:0, refs:[], joined: new Date().toISOString(), withdrawalsDone:0};
+  state.users.push(user);
+  // referido
+  if(ref){
+    const ruser = state.users.find(u=>u.id.toString()===ref || u.alias===ref);
+    if(ruser){ ruser.balance += state.settings.referValue; ruser.refs.push({by:name, at:new Date().toISOString()}); }
+  }
+  save(state); refreshKPI(); $('regMsg').innerText = 'Cuenta creada. Volvé a Inicio.'; setTimeout(()=>{ $('regMsg').innerText=''; show(); },1200);
+}
+
+// --- tasks
+$('btnTasks').onclick = ()=>{ renderTasks(); show('tasksSection'); }
+function renderTasks(){
+  const list = $('tasksList'); list.innerHTML='';
+  state.campaigns.filter(c=>c.active).forEach(c=>{
+    const el = document.createElement('div'); el.className='task';
+    el.innerHTML = `<div><strong>${c.name}</strong><div class='muted small'>${c.desc}</div></div><div><button data-id='${c.id}' class='doTask'>Hacer tarea (₲${state.settings.taskValue})</button></div>`;
+    list.appendChild(el);
+  });
+  document.querySelectorAll('.doTask').forEach(b=>b.onclick = doTask);
+}
+
+function doTask(e){
+  const id = e.target.dataset.id; const userAlias = prompt('Ingresá tu alias registrado para acreditar la tarea:');
+  if(!userAlias) return alert('Necesitás alias.');
+  const user = state.users.find(u=>u.alias===userAlias);
+  if(!user) return alert('Usuario no encontrado. Registrate primero.');
+  const camp = state.campaigns.find(c=>c.id===id);
+  if(!camp || !camp.active) return alert('Campaña no disponible.');
+  // verificar si ya hizo tarea para ese anunciante
+  user.tasks = user.tasks||[];
+  if(user.tasks.find(t=>t.campaignId===id)) return alert('Ya realizaste la tarea de este anunciante.');
+  if(camp.poolRemaining < state.settings.taskValue) return alert('Fondos insuficientes en la campaña.');
+  // pagar
+  user.balance += state.settings.taskValue;
+  user.tasks.push({campaignId:id, at:new Date().toISOString(), value:state.settings.taskValue});
+  camp.poolRemaining -= state.settings.taskValue;
+  if(camp.poolRemaining <=0) camp.active = false;
+  save(state); refreshKPI(); alert('Tarea validada. Se acreditaron ' + fmt(state.settings.taskValue));
+}
+
+// --- My account
+$('btnMy').onclick = ()=>{ show('myAccount'); renderMy(); }
+$('btnReferalLink').onclick = ()=>{ const a = prompt('Ingresá tu alias para generar tu código de referido:'); const u = state.users.find(x=>x.alias===a); if(!u) return alert('Usuario no encontrado'); alert('Tu código de referido es: ' + u.id); }
+
+function renderMy(){ const alias = prompt('Ingresá tu alias para ver tu cuenta:'); if(!alias) return show(); const u = state.users.find(x=>x.alias===alias); if(!u) return alert('Usuario no encontrado'); window.currentUser = u; $('meName').innerText = u.alias; $('meBalance').innerText = fmt(u.balance); $('meWiths').innerText = (u.withdrawalsDone||0); $('userBadge').innerText = u.alias; }
+
+// withdraw
+$('btnRequestWithdraw').onclick = ()=>{
+  if(!window.currentUser) return alert('Primero abrí tu cuenta en Mi Cuenta.');
+  const u = window.currentUser;
+  const min = state.settings.firstWithdrawMin;
+  if(u.balance < min) return alert('Saldo insuficiente. Mínimo ' + fmt(min));
+  // first withdraw check
+  if((u.withdrawalsDone||0)===0){ // requiere 20 referidos
+    if((u.refs||[]).length < state.settings.firstWithdrawRefs) return alert('Para tu primer retiro necesitás ' + state.settings.firstWithdrawRefs + ' referidos registrados.');
+  }
+  const want = confirm('Deseás solicitar el retiro de todo tu saldo ahora? OK = Sí, Cancelar = No');
+  if(!want) return;
+  const req = {id:Date.now(), userId:u.id, alias:u.alias, amount:u.balance, at:new Date().toISOString(), status:'pending'};
+  state.withdrawals.push(req);
+  save(state); alert('Retiro solicitado. Se notificará al administrador para su verificación.'); renderWithdrawList(); }
+
+function renderWithdrawList(){ const el = $('withdrawList'); el.innerHTML=''; state.withdrawals.filter(w=>w.status==='pending').forEach(w=>{
+  const d = document.createElement('div'); d.className='task'; d.innerHTML = `<div><strong>${w.alias}</strong><div class='muted small'>${fmt(w.amount)} - ${w.at}</div></div><div><button data-id='${w.id}' class='approve'>Aprobar</button> <button data-id='${w.id}' class='deny'>Rechazar</button></div>`;
+  el.appendChild(d);
+ }); document.querySelectorAll('.approve').forEach(b=>b.onclick=approveWithdraw); document.querySelectorAll('.deny').forEach(b=>b.onclick=denyWithdraw);
+}
+
+function approveWithdraw(e){ const id = Number(e.target.dataset.id); const w = state.withdrawals.find(x=>x.id===id); if(!w) return; // procesar
+  const u = state.users.find(x=>x.id===w.userId);
+  if(!u) return alert('Usuario no encontrado');
+  // transferir - simulación: descontar saldo
+  u.balance -= w.amount; u.withdrawalsDone = (u.withdrawalsDone||0)+1; w.status='approved'; save(state); renderWithdrawList(); refreshKPI(); alert('Retiro aprobado. Coordiná pago externo (Giropay/Tigo Money).'); }
+
+function denyWithdraw(e){ const id = Number(e.target.dataset.id); const w = state.withdrawals.find(x=>x.id===id); if(!w) return; w.status='rejected'; save(state); renderWithdrawList(); alert('Retiro rechazado. Enviá mensaje al usuario explicando el motivo.'); }
+
+// --- Admin: create campaign
+$('btnCreateCamp').onclick = ()=>{
+  const name = $('c_name').value.trim(); const desc = $('c_desc').value.trim(); const budget = Number($('c_budget').value)||0; const limit = Number($('c_limit').value)||100;
+  if(!name || budget < 150000) return alert('Nombre y presupuesto mínimo ₲150.000');
+  // compute pool and owner fee
+  const pool = 100000; const fee = budget - pool; if(fee < 0) return alert('Presupuesto insuficiente para la estructura.');
+  const camp = {id:Date.now().toString(), name, desc, budget, poolRemaining:pool, ownerFee:fee, active:true, limit, created:new Date().toISOString()};
+  state.campaigns.push(camp); save(state); refreshKPI(); alert('Campaña creada. ₲' + pool + ' disponibles para tareas. Fee: ₲' + fee);
+  renderTasks(); renderCampaignsAdmin(); }
+
+function renderCampaignsAdmin(){ /* update counts */ }
+
+// --- Admin users list
+function renderUsersAdmin(){ const el = $('usersList'); el.innerHTML=''; state.users.forEach(u=>{
+  const d = document.createElement('div'); d.className='task'; d.innerHTML = `<div><strong>${u.alias}</strong><div class='muted small'>Saldo: ${fmt(u.balance)} - Refs: ${ (u.refs||[]).length }</div></div><div><button data-id='${u.id}' class='pay'>Pagar manual</button></div>`;
+  el.appendChild(d);
+ }); document.querySelectorAll('.pay').forEach(b=>b.onclick = (e)=>{ const id = Number(e.target.dataset.id); const u = state.users.find(x=>x.id===id); if(!u) return; const amt = Number(prompt('Ingrese monto a pagar (₲):', u.balance)); if(!amt) return; if(amt > u.balance) return alert('Saldo insuficiente'); u.balance -= amt; save(state); refreshKPI(); renderUsersAdmin(); alert('Pago manual registrado. Coordiná el envío (Giropay/Tigo).'); }); }
+
+// init
+refreshKPI(); renderWithdrawList(); renderUsersAdmin();
+
+// simple admin access via button
+$('btnPanel').onclick = ()=>{
+  const pass = prompt('Clave admin:'); if(pass !== adminPass) return alert('Clave incorrecta'); // show admin panel actions
+  window.scrollTo(0,0); alert('Acceso de administrador activo. Revisá el panel lateral para crear campañas y gestionar solicitudes.'); renderWithdrawList(); renderUsersAdmin(); }
+
+</script>
+</body>
+</html>
